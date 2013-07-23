@@ -1,0 +1,204 @@
+<html>
+<head>
+  <meta name="viewport" content="width=320, user-scalable=no">
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>Rezultati pretrage</title>
+  <link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="css/jquery.dataTables.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <script type="text/javascript" charset="utf-8" src="js/mosyncbridge.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/jquery.dataTables.js"></script>
+  <script type="text/javascript">
+    function getAllParameters() {
+      var results = [];
+      var match,
+          search = /([^&=]+)=?([^&]*)/g,
+          decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); },
+          query  = window.location.search.substring(1);
+      while (match = search.exec(query)) {
+        results[decode(match[1])] = decode(match[2]);
+      }
+      return results;
+    }
+    
+    var all = getAllParameters();
+    var jezik = all['jezik'];
+
+    function functioncall() { // JavaScriptu je dostupan all u scope-u
+      function checkOperator(operator) {
+        if (typeof all[operator] != "undefined") {
+          if (all[operator] !== "<" && all[operator] !== ">" && all[operator] !== "=") {
+            return false;
+          }
+        }
+        return true;
+      }
+      function checkIntNum(num) {
+        if (typeof all[num] === "undefined" || all[num] === "") {
+          return true;
+        }
+        function isNumber(n) {
+          return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        function isInteger(x) {
+          return (parseFloat(x) - parseInt(x) === 0)
+        }
+        if (isNumber(all[num]) === true) {
+          if (isInteger(all[num]) === true) {
+            return true;
+          }
+        }
+        return false;
+      }
+      function checkRegex(arg, regExp) {
+        var checkString = all[arg];
+        if (typeof checkString === "undefined" || checkString === "") {
+          return true;
+        }
+        for(var i = 0; i < checkString.length; i++) {
+          if (!checkString.charAt(i).match(regExp)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      function checkNumSVI(arg) {
+        if ((checkRegex(arg, /^[0-9]$/) || (all[arg] === ""))  === false) {
+          return false;
+        }
+        return true;
+      }
+      function parameter(name) {
+        if (typeof all[name] === "undefined" || all[name] === "") {
+          return "nil,";
+        } else {
+          return ("'" + all[name] + "',");
+        }
+      }
+      function paramWithOper(name, nameOper) {
+        if (typeof all[name] === "undefined" || all[name] === "") {
+          return "nil,";
+        } else {
+          if (typeof all[nameOper] === "undefined") {
+            throw new Error("korisnik je postavio krivi operator");
+          }
+          return ("'" + all[nameOper] + all[name] + "',");
+        }
+      }
+								
+      if ((checkOperator("ectsOper") && checkOperator("predOper") && checkOperator("labOper")) === false) {
+        return "";
+      }
+      if ((checkIntNum("sifpred") && checkIntNum("ectsbod") && checkIntNum("satipred") && checkIntNum("satilab")) === false) {
+        return "";
+      }
+      if ((checkNumSVI("semestar") && checkNumSVI("eng")) === false) {
+        return "";
+      }				
+      if ((checkRegex("nazivpred", /^[A-Za-z0-9ČčĆćŽžŠšĐđ ]$/) && checkRegex("ime", /^[A-Za-zČčĆćŽžŠšĐđ ]$/) 
+             && checkRegex("prezime", /^[A-Za-zČčĆćŽžŠšĐđ ]$/) && checkRegex("opispred", /^[-A-Za-zČčĆćŽžŠšĐđ \/",.;:_()]$/)) === false) {
+        return "";
+      }
+      if (all["razina"] !== "" && all["razina"] !== "P" && all["razina"] !== "D") {
+        return "";
+      }
+      if ((checkRegex("nazivvrsta", /^[-.,A-Za-z0-9ČčĆćŽžŠšĐđ ]$/) && checkRegex("nazivsmjer", /^[A-Za-zČčĆćŽžŠšĐđ ]$/)) === false) {
+        return "";
+      }
+      if (all["nemaocjenu"] !== "" && all["nemaocjenu"] !== "DA" && all["nemaocjenu"] !== "NE") {
+        return "";
+      }
+      if (all["jezik"] !== "" && all["jezik"] !== "hr" && all["jezik"] !== "en") {
+        return "";
+      }
+      if (checkRegex("sveuciliste", /^[&A-Za-zČčĆćŽžŠšĐđ ]$/) === false) {
+        return "";
+      }
+
+      var local;
+      try {
+        local = parameter("sifpred") + paramWithOper("ectsbod", "ectsOper")
+                + parameter("nemaocjenu") + parameter("engleski")
+                + paramWithOper("satipred", "predOper") + paramWithOper("satilab", "labOper")
+                + parameter("nazivpred") + parameter("opispred")
+                + parameter("jezik") + parameter("ime")
+                + parameter("prezime") + parameter("semestar")
+                + parameter("nazivsmjer") + parameter("razina") 
+                + parameter("nazivvrsta") + parameter("sveuciliste");
+      } catch (err) {
+    	  return "";
+      }
+      local = "FERLua:resultsCompute(" + local.slice(0, local.length - 1) + ")"; 
+      return local;
+    }
+   	  
+    function drawTable(dataString){
+		$('#tableData').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+		var data = dataString.split('$'),
+		    newdata = [],
+		    counter = 1,
+		    elem, name, lan, ID;
+		for(item in data) { // data = nazivpred#jezik#sifpred
+			elem = data[item].split('#');
+			name = elem[0];
+			lan = elem[1];
+			ID = elem[2];
+			newdata.push([counter, '<a href="subject.html?id=' + ID + '&name=' + name +'&lan='+ lan +'">' + name + '(' + ID + ')' + '</a>']);
+			++counter;
+		}
+		if (jezik === 'en') {
+			$('#example').dataTable( {
+		        "aaData": newdata,
+		        "aoColumns": [{"sTitle":"No."},{"sTitle":"Course name(ID)"}]
+			  });
+		} else {
+		  $('#example').dataTable( {
+	        "aaData": newdata,
+	        "aoColumns": [{"sTitle":"No."},{"sTitle":"Naziv predmeta(ID)"}]
+		  });
+		}
+		all = null;
+		jezik = null;
+	}
+    
+    function drawResultsHTML(data) {
+      if (jezik === 'en') {
+    	  document.getElementById("linkMain").innerHTML = '<a href="main.html">Back to search form</a>';
+      } else {
+        document.getElementById("linkMain").innerHTML = '<a href="main.html">Natrag na pretragu</a>';
+      }
+      if (data === "") {
+        if (jezik === 'en') {
+          document.getElementById("sadrzaj").innerHTML = 'We are sorry. There is not a single course that meets given demands.';
+        } else {
+          document.getElementById("sadrzaj").innerHTML = 'Nažalost nije pronađen niti jedan predmet koji zadovoljava zadane podatke.';
+        }
+     } else {
+    	if(jezik === 'en') {
+    		document.getElementById("sadrzaj").innerHTML = 'Retrived data is:';
+    	} else {
+      	  document.getElementById("sadrzaj").innerHTML = 'Dohvaćeni podatci su sljedeći:';
+        }
+      	drawTable(data); // ovaj dio prikazuje tablicu. Moze se maknut/promijenit u novim implementacijama prikaza rezultata.
+      }
+    }
+    
+    function collectResults() {
+      var call = functioncall();
+      if (call === "") {
+    	  document.getElementById("linkMain").innerHTML = '<a href="main.html">Natrag na pretragu</a>';
+    	  document.getElementById("sadrzaj").innerHTML = 'Nedopušteni podatci u pretrazi!';
+      } else {
+        EvalLua(unescape(encodeURIComponent(call)));
+      }  
+    }
+  </script>
+</head>
+<body onload="collectResults()">
+	<div id="screen">
+		<p id="linkMain"></p>
+		<div id="sadrzaj"></div>
+		<div id="tableData"></div>
+	</div>
+</body>
+</html>

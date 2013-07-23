@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=320, user-scalable=no">
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>Obrazac za pretragu</title>
+  <link rel="stylesheet" href="style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <script type="text/javascript" charset="utf-8" src="js/mosyncbridge.js"></script>
+  <script type="text/javascript">
+  var dictionary = {};
+  dictionary['hr'] = {};
+  dictionary['hr']['welcome'] = 'Dobrodošli!';
+  dictionary['hr']['instructions'] = 'Unesite podatke prema kojima želite pretraživati predmete.';
+  
+  dictionary['hr']['sifpredField'] = 'ID predmeta:';
+  dictionary['hr']['nazivpredField'] = 'Naziv predmeta:';
+  dictionary['hr']['imeField'] = 'Ime nastavnika:';
+  dictionary['hr']['prezimeField'] = 'Prezime nastavnika:';
+  dictionary['hr']['razinaField'] = 'Razina:';
+    dictionary['hr']['razina1'] = 'SVI';
+    dictionary['hr']['razina2'] = 'Preddiplomski';
+    dictionary['hr']['razina3'] = 'Diplomski';
+  dictionary['hr']['semestarField'] = 'Semestar:';
+  dictionary['hr']['jezikField'] = 'Jezik(eng. Language):';
+    dictionary['hr']['jezik1'] = 'SVI';
+    dictionary['hr']['jezik2'] = 'en';
+    dictionary['hr']['jezik3'] = 'hr';
+  dictionary['hr']['smjerField'] = 'Smjer:';
+  dictionary['hr']['tipField'] = 'Tip:';
+  dictionary['hr']['opispredField'] = 'U opisu sadrži:';
+  dictionary['hr']['satipredField'] = 'Sati pred:';
+  dictionary['hr']['satilabField'] = 'Sati lab:';
+  dictionary['hr']['engleskiField'] = 'Engleski:';
+  dictionary['hr']['vjestinaField'] = 'Nema ocjenu:';
+    dictionary['hr']['vjestina1'] = 'SVI';
+    dictionary['hr']['vjestina2'] = 'DA';
+    dictionary['hr']['vjestina3'] = 'NE';
+  dictionary['hr']['sveucilisteField'] = 'Slicni sa:';
+  
+  dictionary['hr']['errID'] = 'ID mora biti cijeli broj!';
+  dictionary['hr']['errName'] = 'Naziv predmeta nije ispravno zadan!';
+  dictionary['hr']['errIme'] = 'Ime nastavnika nije ispravno zadano!';
+  dictionary['hr']['errPrezime'] = 'Prezime nastavnika nije ispravno zadano!';
+  dictionary['hr']['errECTS'] = 'Broj ECTS bodova mora biti cijeli broj!';
+  dictionary['hr']['errOpis'] = 'Nedopusteni znakovi u opisu predmeta!';
+  dictionary['hr']['errPred'] = 'Broj sati predavanja mora biti cijeli broj!';
+  dictionary['hr']['errLab'] = 'Broj sati utrošenih na laboratorij mora biti cijeli broj!';
+  dictionary['hr']['errNotice'] = 'Nedopušteni znak';
+
+  dictionary['en'] = {};
+  dictionary['en']['welcome'] = 'Welcome!';
+  dictionary['en']['instructions'] = 'Enter parameters to find subjects.';
+  
+  dictionary['en']['sifpredField'] = 'Course ID:';
+  dictionary['en']['nazivpredField'] = 'Subject name:';
+  dictionary['en']['imeField'] = 'Teacher\'s name:';
+  dictionary['en']['prezimeField'] = 'Teacher\'s lastname:';
+  dictionary['en']['razinaField'] = 'Study program cycle:';
+    dictionary['en']['razina1'] = 'ALL';
+    dictionary['en']['razina2'] = 'Undergraduate';
+    dictionary['en']['razina3'] = 'Graduate';
+  dictionary['en']['semestarField'] = 'Semester:';
+  dictionary['en']['jezikField'] = 'Language:';
+    dictionary['en']['jezik1'] = 'ALL';
+    dictionary['en']['jezik2'] = 'en';
+    dictionary['en']['jezik3'] = 'cro';
+  dictionary['en']['smjerField'] = 'Study programs';
+  dictionary['en']['tipField'] = 'Course type:';
+  dictionary['en']['opispredField'] = 'Description contains:';
+  dictionary['en']['satipredField'] = 'Lectures:';
+  dictionary['en']['satilabField'] = 'Laboratory exercises:';
+  dictionary['en']['engleskiField'] = 'English level:';
+  dictionary['en']['vjestinaField'] = 'Not graded:';
+    dictionary['en']['vjestina1'] = 'ALL';
+    dictionary['en']['vjestina2'] = 'YES';
+    dictionary['en']['vjestina3'] = 'NO';
+  dictionary['en']['sveucilisteField'] = 'Similar courses:';
+  
+  dictionary['en']['errID'] = 'ID must be an integral value';
+  dictionary['en']['errName'] = 'Name of the course is not properly assigned!';
+  dictionary['en']['errIme'] = 'Teacher\'s name is not properly assigned!';
+  dictionary['en']['errPrezime'] = 'Teacher\'s last name is not properly assigned!';
+  dictionary['en']['errECTS'] = 'Assigned ECTS points must be an integral value!';
+  dictionary['en']['errOpis'] = 'Forbiden caracters in the course description.!';
+  dictionary['en']['errPred'] = 'Assigned hours of lecture must be an integral value!';
+  dictionary['en']['errLab'] = 'Assigned hours of laboratory exercises must be an integral value!';
+  dictionary['en']['errNotice'] = 'Illegal character';
+  
+  var language = 'hr';
+  function changeLanguage(lan) {
+    if (lan === '') 
+      return;    
+    for(var key in dictionary[lan]) {
+      if(key.indexOf('err') != -1) {
+        break;  // nije najsretnije rjesenje
+      }
+      var doc = document.getElementById(key).innerHTML;
+      var pos = doc.indexOf('<');
+      if (pos < 0) {
+        document.getElementById(key).innerHTML = dictionary[lan][key];
+      } else if (pos >= 0) {
+        document.getElementById(key).innerHTML = dictionary[lan][key] + doc.substring(pos);
+      }
+    }
+    language = lan;
+  }
+  
+    var formData = []; // smjer_hr_p, smjer_hr_d, smjer_en_p, smjer_en_d, tip_hr_p, tip_hr_d, tip_en_p, tip_en_d, sveucilista 
+    function createData(index, dataStr) {
+      formData[index] = dataStr.split("$");
+    }
+
+    function change(val, level, slc_target, hr_p, hr_d, en_p, en_d) {
+      function mergeOne(ar, level) {
+        var result = [];
+        for(var i = 0; i < ar.length; ++i) {
+          result[i] = level + ar[i];
+        }
+        return result;
+      }
+      function mergeTwo(ar_p, ar_d, under, grad) {
+        var result = [],
+            length = ar_p.length + ar_d.length,
+            pointerArP = 0, pointerArD = 0;
+        for(var i = 0; i < length; ++i) {
+          if (ar_p[pointerArP] <= ar_d[pointerArD]) {
+            result.push(under + ar_p[pointerArP++] );
+            if (pointerArP === ar_p.length) {
+              while(pointerArD < ar_d.length) {
+                result.push(grad + ar_d[pointerArD++]);
+              }
+              break;
+            }
+          } else {
+            result.push(grad+ ar_d[pointerArD++]);
+            if (pointerArD === ar_d.length) {
+              while(pointerArP < ar_p.length) {
+                result.push(under + ar_p[pointerArP++]);
+              }
+              break;
+            }
+          }	
+        }
+        return result;
+      }
+
+      var hr_options = null;
+      var en_options = null;
+      switch (level) {
+        case "": {  if (val === "" || val === "hr") {
+                      hr_options = mergeTwo(hr_p, hr_d, "P: ", "D: ");
+                    }
+                    if(val === "" || val === "en") {
+                      en_options = mergeTwo(en_p, en_d, "U: ", "G: ");
+                    }
+                    break;
+                 }
+        case "P": {  if (val === "" || val === "hr") {
+                       hr_options = mergeOne(hr_p, "P: ");
+                     }
+                     if(val === "" || val === "en") {
+                       en_options = mergeOne(en_p, "U: ");
+                     }
+                     break;
+                  }
+        case "D": {  if (val === "" || val === "hr") {
+                       hr_options = mergeOne(hr_d, "D: ");
+                     }
+                     if(val === "" || val === "en") {
+                       en_options = mergeOne(en_d, "G: ");
+                     }
+                     break;
+                  }
+      }
+      var slc_target = document.getElementById(slc_target);
+      slc_target.options.length = 0;
+      slc_target.options[0] = new Option("SVI", "");  
+      switch (val) {
+        case "": {  var all_options = mergeTwo(hr_options, en_options, "", "");
+                       for(var i = 0; i < all_options.length; ++i) {
+                         slc_target.options[i + 1] = new Option(all_options[i], all_options[i].substring(3));
+                       }
+                       break;
+                     }
+        case "en":  {  for(var i = 0; i < en_options.length; ++i) {
+                         slc_target.options[i + 1] = new Option(en_options[i], en_options[i].substring(3));
+                       }
+                       break;
+                    }
+        case "hr":	{  for (var i = 0; i < hr_options.length; ++i) {
+                         slc_target.options[i + 1] = new Option(hr_options[i], hr_options[i].substring(3));
+                       }
+                       break;
+                    }
+      }
+    }
+    
+    function srcChangeJezik(val) {
+      var e = document.getElementById("razina");
+      var level = e.options[e.selectedIndex].value;
+      change(val, level, "smjer", formData["smjer_hr_p"], formData["smjer_hr_d"], formData["smjer_en_p"], formData["smjer_en_d"]);
+      change(val, level, "tip", formData["tip_hr_p"], formData["tip_hr_d"], formData["tip_en_p"], formData["tip_en_d"]);
+      changeLanguage(val);
+      var allOptions = document.all('jezik');
+      for(var i = 0; i < allOptions.length; ++i) {
+    	  if (allOptions.options[i].value === val) {
+          allOptions.selectedIndex = i;
+          break;
+        }
+      }
+      allOptions = document.all('razina');
+      for(var i = 0; i < allOptions.length; ++i) {
+    	  if (allOptions.options[i].value === level) {
+          allOptions.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    
+    function srcChangeRazina(val) {
+      var to = 7;
+      if (val == "D") {
+        to = 5;
+      } 
+      var slc_target = document.getElementById("semestar");
+      slc_target.options.length = 0;
+      slc_target.options[0] = new Option("SVI", "");
+      for(var i = 1; i < to; ++i) {
+        slc_target.options[i] = new Option(i.toString(), i.toString());
+      }
+      var e = document.getElementById("jezik");
+      var jezik = e.options[e.selectedIndex].value;      
+      change(jezik, val, "smjer", formData["smjer_hr_p"], formData["smjer_hr_d"], formData["smjer_en_p"], formData["smjer_en_d"]);
+      change(jezik, val, "tip", formData["tip_hr_p"], formData["tip_hr_d"], formData["tip_en_p"], formData["tip_en_d"]);
+    }
+    
+    function initialize() {
+      srcChangeRazina("");
+      var slc_target = document.getElementById("sveuciliste");
+      slc_target.options.length = 0;
+      slc_target.options[0] = new Option("SVI", "");
+      for(var i = 0; i < formData["sveucilista"].length; ++i) {
+          slc_target.options[i + 1] = new Option(formData["sveucilista"][i], formData["sveucilista"][i]);
+      }
+      changeLanguage(language);
+    }
+    
+    function validateForm() {
+      function checkIntNum(arg) {
+        function isNumber(n) {
+          return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        function isInteger(x) {
+          return (parseFloat(x) - parseInt(x) === 0)
+        }
+        if (isNumber(arg) === true) {
+          if (isInteger(arg) === true) {
+            return true;
+          }
+        }
+        return false;
+	  }
+      function checkRegex(checkString, regExp) {
+        for(var i = 0; i < checkString.length; i++) {
+          if (!checkString.charAt(i).match(regExp)) {
+            alert(dictionary[language]['errNotice'] + checkString.charAt(i));
+            return false;
+          }
+        }
+        return true;
+      }
+      function checkField(field, errMsg, func, arg) {
+        var temp = document.forms["search"][field].value;
+        if (temp != "") {
+          if (func(temp, arg) === false) {
+            alert(errMsg);
+            return false;
+          }
+        }
+        return true;
+      }
+      
+      return (checkField("sifpred", dictionary[language]['errID'], checkIntNum) && 
+        checkField("nazivpred", dictionary[language]['errName'], checkRegex, /^[A-Za-z0-9ČčĆćŽžŠšĐđ ]$/) &&
+        checkField("ime", dictionary[language]['errIme'], checkRegex, /^[A-Za-zČčĆćŽžŠšĐđ ]$/) &&
+        checkField("prezime", dictionary[language]['errPrezime'], checkRegex, /^[A-Za-zČčĆćŽžŠšĐđ ]$/) &&
+        checkField("ectsbod", dictionary[language]['errECTS'], checkIntNum) &&
+        checkField("opispred", dictionary[language]['errOpis'], checkRegex, /^[-A-Za-zČčĆćŽžŠšĐđ \/",.;:_()]$/) &&
+        checkField("satipred", dictionary[language]['errPred'], checkIntNum) &&
+        checkField("satilab", dictionary[language]['errLab'], checkIntNum));   
+	}
+    
+    function action() {
+      EvalLua('FERLua:initializeMainHtml()');
+    }
+	</script>
+</head>
+<body id='body' onload="action()">
+    <div id="welcome"></div>
+    <div id="instructions"></div>
+	<form name="search" action="results.html" method="get" onsubmit="return validateForm()" onReset="{var e = document.getElementById('jezik') ; e.options[e.selectedIndex].value = '' ; srcChangeRazina('')}">
+		<table>
+		    <tr>
+		        <td id="jezikField" width="100"></td>
+		        <td width="100"><select id="jezik" name="jezik" onchange="srcChangeJezik(this.value)">
+										<option id="jezik1" value=""></option>
+										<option id="jezik2" value="en"></option>
+										<option id="jezik3" value="hr"></option>
+									   </select></td>
+		    </tr>
+			<tr>
+				<td id="sifpredField" width="100"><input id="sifpred" type="text" name="sifpred" value=""></td>
+				<td id="nazivpredField" width="100"><input id="nazivpred" type="text" name="nazivpred" value=""></td>
+			</tr>
+			<tr>
+				<td id="imeField" width="100"><input id="ime" type="text" name="ime" value=""></td>
+				<td id="prezimeField" width="100"><input id="prezime" type="text" name="prezime" value=""></td>
+			</tr>			
+			<tr>
+				<td id="razinaField" width="100"><select id="razina" name="razina" onchange="srcChangeRazina(this.value)">
+										<option id="razina1" value=""></option>
+										<option id="razina2" value="P"></option>
+										<option id="razina3" value="D"></option>
+									</select></td>
+				<td width="100">ECTS:<select id="ectsOper" name="ectsOper">
+										<option value="=">=</option>
+										<option value="<"><</option>
+										<option value=">">></option>
+									   </select><input id="ectsbod" type="text" name="ectsbod" value=""></td>
+			</tr>
+			<tr>
+				<td id="semestarField" width="100"><select id="semestar" name="semestar"></select></td>
+				<td id="opispredField" width="100"><input id="opispred" type="text" name="opispred" value=""></td>
+			</tr>
+			</tr>
+			<tr>
+				<td id="smjerField" colspan=2><select id="smjer" name="nazivsmjer"></select></td>
+			</tr>
+			<tr>
+				<td id="tipField" colspan=2><select id="tip" name="nazivvrsta""></select></td>
+			</tr>
+			<tr>
+				<td id="satipredField" width="100"><select id="predOper" name="predOper">
+                        <option value="=">=</option>
+                        <option value="<"><</option>
+                        <option value=">">></option>
+									   </select><input id="satipred" type="text" name="satipred" value=""></td>
+				<td id="satilabField" width="100"><select id="labOper" name="labOper">
+												<option value="=">=</option>
+												<option value="<"><</option>
+												<option value=">">></option>
+											</select><input id="satilab" type="text" name="satilab" value=""></td>
+			</tr>
+			<tr>
+				<td id="engleskiField" width="100"><select id="engleski" name="engleski">
+                        <option value="">SVI</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                      </select></td>
+				<td id="vjestinaField" width="100"><select id="nemaocjenu" name="nemaocjenu">
+                        <option id="vjestina1" value=""></option>
+                        <option id="vjestina2" value="DA"></option>
+                        <option id="vjestina3" value="NE"></option>
+                      </select></td>
+			</tr>
+      <tr>
+        <td id="sveucilisteField" colspan=2><select id="sveuciliste" name="sveuciliste"></select></td>
+      </tr>
+		</table>
+		<input type="submit" value="Predaj" />
+		<input type="reset" value="Reset" />
+	</form>
+</body>
+</html>

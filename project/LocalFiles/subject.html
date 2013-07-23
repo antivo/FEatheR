@@ -1,0 +1,280 @@
+<html>
+<head>
+  <meta name="viewport" content="width=320, user-scalable=no">
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>Prikaz predmeta</title>
+  <script type="text/javascript" charset="utf-8" src="js/mosyncbridge.js"></script>
+  <script type="text/javascript">
+    function getValue(varname) {
+      var url = window.location.href,			  
+          qparts = url.split("?");
+      if (qparts.length == 0) {
+        return "";
+      }
+      var query = qparts[1],
+          vars = query.split("&"),
+          value = "";
+      for (var i = 0; i < vars.length; ++i) {
+        parts = vars[i].split("=");
+        if (parts[0] == varname) {
+          value = parts[1];
+          break;
+        }
+      }
+      value = unescape(value);
+      value.replace(/\+/g," ");
+      return value;
+    }
+    
+    var nazivpred = getValue("name"),
+        sifpred = getValue("id"),
+        jezik = getValue("lan"),
+        subjectData = [],
+        containerData = [],
+        dictionary = [];
+    if (jezik === 'hr') {
+      dictionary['linkMainTekst'] = 'Natrag na pretragu';
+      dictionary['linkResultsTekst'] = 'Natrag na rezultate';
+      dictionary['sadrzaj'] = 'Podatci zadani u URL ne odgovaraju nijednom postojećem predmetu.';
+      dictionary['Opis predmeta'] = 'Opis predmeta';
+      dictionary['Vrsta predmeta'] = 'Vrsta predmeta';
+      dictionary['Nastavno osoblje'] = 'Nastavno osoblje';
+      dictionary['Ocjenjivanje'] = 'Ocjenjivanje';
+      dictionary['Ostale info'] = 'Ostale info';
+      dictionary['Sati nastave'] = 'Sati nastave';
+      dictionary['Ishodi učenja'] = 'Ishodi učenja';
+      dictionary['Opće kompetencije'] = 'Opće kompetencije';
+      dictionary['Oblici nastave'] = 'Oblici nastave';
+      dictionary['Način ocjenjivanja'] = 'Način ocjenjivanja';
+      dictionary['Tjedni plan nastave'] = 'Tjedni plan nastave';
+      dictionary['Literatura'] = 'Literatura';
+      dictionary['Sličan predmet na srodnim sveučilištima'] = 'Sličan predmet na srodnim sveučilištima';
+    
+      alert('aj necu gori');
+      
+      dictionary['Nositelji'] = 'Nositelji';
+      dictionary['Predavači'] = 'Predavači';
+      dictionary['Izvođači_lab'] = 'Izvođači_lab';
+      dictionary['Izvođači_aud'] =  'Izvođači_aud';
+      dictionary['Predmet se ocjenjuje s pao/položio.'] = 'Predmet se ocjenjuje s pao/položio.';
+      dictionary['Dovoljan'] = 'Dovoljan';
+      dictionary['Dobar'] = 'Dobar';
+      dictionary['Vrlo dobar'] = 'Vrlo dobar';
+      dictionary['Odličan'] = 'Odličan';
+      dictionary['Engleski'] = 'Engleski';
+      dictionary['EngleskiLevel'] = 'R';
+      dictionary['Preduvjeti'] = 'Preduvjeti';
+      alert('pola');
+      dictionary['Predmet se ne predaje.'] = 'Predmet se ne predaje.';
+      dictionary['Ocjena napomena'] = 'Ocjena napomena';
+      dictionary['Bodovi napomena'] = 'Bodovi napomena';
+      dictionary['Predavanja'] = 'Predavanja';
+      dictionary['Auditorne vježbe'] = 'Auditorne vježbe';
+      dictionaryp['Laboratorijske vježbe'] = 'Laboratorijske vježbe';
+      dictionary['Kontinuirana nastava'] = 'Kontinuirana nastava';
+      dictionary['Ispitni rok'] = 'Ispitni rok';
+      dictionary['Vrsta provjere'] = 'Vrsta provjere';
+      dictionary['Prag'] = 'Prag';
+      dictionary['Udio u ocjeni'] = 'Udio u ocjeni';
+      alert('do kraja');
+    } else if (jezik === 'en') {
+      dictionary['linkMainTekst'] = 'Back to the search form';
+      dictionary['linkResultsTekst'] = 'Back to results';
+      dictionary['sadrzaj'] = 'Arguments passed in URL do not correspond to any existing subject.';
+      dictionary['Opis predmeta'] = 'Course Description';
+      dictionary['Vrsta predmeta'] = 'Course Type';
+      dictionary['Nastavno osoblje'] = 'Lecturer in charge';
+      dictionary['Ocjenjivanje'] = 'Grading';
+      dictionary['Ostale info'] = 'Other info';
+      dictionary['Sati nastave'] = 'Teaching hours';
+      dictionary['Ishodi učenja'] = 'Learning Outcomes';
+      dictionary['Opće kompetencije'] = 'General Competencies';
+      dictionary['Oblici nastave'] = 'Forms of teaching';
+      dictionary['Način ocjenjivanja'] = 'Grading System';
+      dictionary['Tjedni plan nastave'] = 'Week by Week Schedule';
+      dictionary['Literatura'] = 'Literature';
+      dictionary['Sličan predmet na srodnim sveučilištima'] = 'Simmilar Courses';
+      
+      dictionary['Nositelji'] = 'Course teachers';
+      dictionary['Predavači'] = 'Lecturers';
+      dictionary['Izvođači_lab'] = 'Teaching assistant (laboratory excersice)';
+      dictionary['Izvođači_aud'] = 'Teaching assistant (board exercises)';
+      dictionary['Predmet se ocjenjuje s pao/položio'] = 'This is pass/fail course.';
+      dictionary['Dovoljan'] = 'Acceptable';
+      dictionary['Dobar'] = 'Good';
+      dictionary['Vrlo dobar'] = 'Very good';
+      dictionary['Odličan'] = 'Excellent';
+      dictionary['Engleski'] = 'English';
+      dictionary['EngleskiLevel'] = "L";
+      dictionary['Preduvjeti'] = 'Prerequisites';
+      dictionary['Predmet se ne predaje.'] = 'Subject is not held';
+      dictionary['Ocjena napomena'] = 'Grading remark';
+      dictionary['Predavanja'] = 'Lectures';
+      dictionary['Bodovi napomena'] = 'Scoring remark';
+      dictionary['Auditorne vježbe'] = 'Exercises';
+      dictionary['Laboratorijske vježbe'] = 'Laboratory exercises';
+      dictionary['Kontinuirana nastava'] = 'Continuous Assessment';
+      dictionary['Ispitni rok'] = 'Exam';
+      dictionary['Vrsta provjere'] = 'Type';
+      dictionary['Prag'] = 'Treshold';
+      dictionary['Udio u ocjeni'] = 'Percent of grade';
+    }
+
+    function createData(index, dataStr) {
+      subjectData[index] = dataStr;
+    }
+    
+    function checkExist() {
+      EvalLua("FERLua:checkExistSubject(" + sifpred + ",'" + nazivpred + "','" + jezik + "')");
+      jezik = null;
+    }
+    
+    function createContainerData() { // and destroy subjectData, don t forget to decode
+      if (subjectData['opispred'] != undefined) {  
+        containerData[dictionary['Opis predmeta']] = subjectData['opispred'];
+      }
+      if (subjectData['dostupan'] != undefined) {
+        containerData[dictionary['Vrsta predmeta']] = '<table border="0">' + subjectData['dostupan'] + '</table>';
+      } 
+      if (subjectData['nemaizvod'] === 'f') {
+        containerData[dictionary['Nastavno osoblje']] = "";
+        if (subjectData['nastavnik_N'] != undefined) {
+          containerData[dictionary['Nastavno osoblje']] = containerData[dictionary['Nastavno osoblje']] + '<p id="' + dictionary['Nositelji'] + '"><b>' + dictionary['Nositelji'] + '</b><br/><table border="0">' + subjectData['nastavnik_N'] + '</table></p>';
+        }
+        if (subjectData['nastavnik_P'] != undefined) {
+          containerData[dictionary['Nastavno osoblje']] = containerData[dictionary['Nastavno osoblje']] + '<p id="' + dictionary['Predavači'] + '"><b>' + dictionary['Predavači'] + '</b><br/><table border="0">' + subjectData['nastavnik_P'] + '</table></p>';
+        }
+        if (subjectData['nastavnik_L'] != undefined) {
+          containerData[dictionary['Nastavno osoblje']] = containerData[dictionary['Nastavno osoblje']] + '<p id="' + dictionary['Izvođači_lab'] + '"><b>' + dictionary['Izvođači_lab'] + '</b><br/><table border="0">' + subjectData['nastavnik_L'] + '</table></p>';
+        }
+        if (subjectData['nastavnik_A'] != undefined) {
+          containerData[dictionary['Nastavno osoblje']] = containerData[dictionary['Nastavno osoblje']] + '<p id="' + dictionary['Izvođači_aud'] + '"><b>' + dictionary['Izvođači_aud'] + '</b><br/><table border="0">' + subjectData['nastavnik_A'] + '</table></p>';
+        } 
+      }
+      if (subjectData['nemaocjenu'] === 'f') {
+    	  containerData[dictionary['Ocjenjivanje']] = '<table border=0>';
+        if (subjectData['ocjena2'] != undefined) {
+          containerData[dictionary['Ocjenjivanje']] += '<tr><td><b>' + dictionary['Dovoljan'] + '(2)</b></td><td>' + subjectData['ocjena2'] +'</td></tr>';
+        }
+        if (subjectData['ocjena3'] != undefined) {
+          containerData[dictionary['Ocjenjivanje']] += '<tr><td><b>' + dictionary['Dobar'] + '(3)</b></td><td>' + subjectData['ocjena3'] +'</td></tr>';
+        }
+        if (subjectData['ocjena4'] != undefined) {
+          containerData[dictionary['Ocjenjivanje']] += '<tr><td><b>' + dictionary['Vrlo dobar'] + '(4)</b></td><td>' + subjectData['ocjena4'] +'</td></tr>';
+        }
+        if (subjectData['ocjena5'] != undefined) {
+          containerData[dictionary['Ocjenjivanje']] += '<tr><td><b>' + dictionary['Odličan'] + '(5)</b></td><td>' + subjectData['ocjena5'] +'</td></tr>';
+        }
+        containerData[dictionary['Ocjenjivanje']] += '</table>';
+      } else {
+        containerData[dictionary['Ocjenjivanje']] = dictionary['Predmet se ocjenjuje s pao/položio'];
+      }
+      containerData[dictionary['Ostale info']] = '<table border=0><tr><td><b>' + dictionary['Engleski'] + '</b></td><td>' + dictionary['EngleskiLevel'] + subjectData['engleski'] + '</td></tr></table>';
+      if (subjectData['preduvjet'] != undefined) {
+    	  containerData[dictionary['Ostale info']] += '<table border=0><tr><td><b>' + dictionary['Preduvjeti'] + '</b></td></tr>' + subjectData['preduvjet'] + '</table>';
+      }
+      if (subjectData['predajese'] === 'f') {
+    	  containerData[dictionary['Ostale info']] += '<table border=0><tr><td><b>' + dictionary['Predmet se ne predaje.'] + '</b></td></tr></table>';
+      }
+      if (subjectData['ocjenanapomena'] != undefined) {
+        containerData[dictionary['Ostale info']] += '<table border=0><tr><td><b>' + dictionary['Ocjena napomena'] + '</b></td></tr><tr><td>' + subjectData['ocjenanapomena'] + '</tr></td></table>';
+      }
+      if (subjectData['bodovinapomena'] != undefined) {
+    	  containerData[dictionary['Ostale info']] += '<table border=0><tr><td><b>' + dictionary['Bodovi napomena'] + '</b></td></tr><tr><td>' + subjectData['bodovinapomena'] + '</tr></td></table>';
+      }
+      if ((subjectData['satipred'] != undefined) || (subjectData['satiaud'] != undefined) || (subjectData['satilab'] != undefined)) {
+    	  containerData[dictionary['Sati nastave']] = '<table border=0>';
+    	if (subjectData['satipred'] != undefined) {
+          containerData[dictionary['Sati nastave']] += '<tr><td><b>' + dictionary['Predavanja'] + '</b></td><td>' + subjectData['satipred'] + '</td></tr>';
+        }
+    	if (subjectData['satiaud'] != undefined) {
+          containerData[dictionary['Sati nastave']] += '<tr><td><b>' + dictionary['Auditorne vježbe'] + '</b></td><td>' + subjectData['satiaud'] + '</td></tr>';
+        }
+    	if (subjectData['satilab'] != undefined) {
+          containerData[dictionary['Sati nastave']] += '<tr><td><b>' + dictionary['Laboratorijske vježbe'] + '</b></td><td>' + subjectData['satilab'] + '</td></tr>';
+        }
+    	containerData[dictionary['Sati nastave']] += '</table>';
+      }
+      if (subjectData['ishodi'] != undefined) {
+          containerData[dictionary['Ishodi učenja']] = '<table border=0>' + subjectData['ishodi'] + '</table>';
+        }
+      if (subjectData['kompetencije'] != undefined) {
+        containerData[dictionary['Opće kompetencije']] = subjectData['kompetencije'];
+      }
+      if (subjectData['nemaoblik'] === 'f') {
+        if (subjectData['oblicinastave'] != undefined) {
+          containerData[dictionary['Oblici nastave']] = '<table border=0>' + subjectData['oblicinastave'] + '</table>';
+        }
+      }
+      if (subjectData['nemaocjenu'] === 'f') {
+        if (subjectData['ocjenjivanje'] != undefined) {
+          containerData[dictionary['Način ocjenjivanja']] = '<table border=0><tr><td></td><td colspan=2 align="center">' + dictionary['Kontinuirana nastava'] + '</td><td colspan=2 align="center">' + dictionary['Ispitni rok'] + '</td></tr><tr><td align="center">' + dictionary['Vrsta provjere'] + '</td><td>' + dictionary['Prag'] + '</td><td align="center">' + dictionary['Udio u ocjeni'] + '</td><td>' + dictionary['Prag'] + '</td><td align="center">' + dictionary['Udio u ocjeni'] + '</td></tr>' +  subjectData['ocjenjivanje'] + '</table>';
+        }
+      }
+      if (subjectData['tjedniplan'] != undefined) {
+        containerData[dictionary['Tjedni plan nastave']] = '<table border=0>' + subjectData['tjedniplan'] + '</table>'; 
+      }
+      if (subjectData['nemaLiter'] === 'f') {
+        if(subjectData['literatura'] != undefined) {
+          containerData[dictionary['Literatura']] = '<table border=0>' + subjectData['literatura'] + '</table>';
+        }
+      }
+      if (subjectData['slicni'] != undefined) {
+        containerData[dictionary['Sličan predmet na srodnim sveučilištima']] = '<table border=0>' + subjectData['slicni'] + '</table>';
+      }
+      subjectData.length = 0;
+      subjectData = null;
+    }
+      
+    function updateDataField(field) {
+      document.getElementById('dataField').innerHTML = containerData[field];
+      document.getElementById('dataField').style.display = '';
+      document.getElementById('closeButton').style.display = '';
+    }
+      
+    function createButtons() {
+      var buttons = "",
+          part1 = '<button title="Show ',
+          part2 = '" type="button" onclick="updateDataField(\'',
+          part3 = '\')">',
+          part4 = '</button>';
+      for(var key in containerData) {
+        buttons = buttons + part1 + key + part2 + key + part3 + key + part4;
+      }
+      document.getElementById('buttonField').innerHTML = buttons;
+    }
+    
+    function initialize() { // don t forget to decode recived data
+      document.getElementById("linkMain").innerHTML = '<a href="main.html">' + dictionary['linkMainTekst'] + '</a>';
+      document.getElementById("linkResults").innerHTML = '<input id="goBack" type="button" value="' + dictionary['linkResultsTekst'] + '" onclick="history.go(-1)">';
+      if (subjectData['url'] === undefined) {
+    	  document.getElementById('title').innerHTML = '<h3>' + decodeURIComponent(escape(nazivpred)) + '(' + sifpred  + ') ' + '</h3><h5>' + subjectData['ectsbod'] + ' ECTS</h5>'
+      } else {
+        document.getElementById('title').innerHTML = '<a href="' + subjectData['url'] + '"><h3>' + decodeURIComponent(escape(nazivpred)) + '(' + sifpred  + ') ' + '</h3></a><h5>' + subjectData['ectsbod'] + ' ECTS</h5>';
+      }
+      nazivpred = null;
+      sifpred = null;
+      createContainerData();
+      createButtons();
+    }
+    
+    function doesNotExist() {
+      document.getElementById("linkMain").innerHTML = '<a href="main.html">' + dictionary['linkMainTekst'] + '</a>';
+      document.getElementById("linkResults").innerHTML = '<input id="goBack" type="button" value="' + dictionary['linkResultsText'] + '" onclick="history.go(-1)">';
+      document.getElementById("sadrzaj").innerHTML = dictionary['sadrzaj'];
+    }
+  </script>
+</head>
+<body onload="checkExist()">
+	<div id="screen">
+		<p id="linkMain"></p>
+		<form id="linkResults"></form>
+		<div id="sadrzaj">
+			<p id="title"></p>
+            <div id="buttonField"></div><br/>
+            <div id="dataField" style="display:none"></div>
+            <div id="closeButton" style="display:none"><br/><br/><button title="Close button" type="button" onclick="{document.getElementById('dataField').style.display='none'; document.getElementById('closeButton').style.display='none';}">Close</button></div>
+	    </div>
+    </div>
+</body>
+<html>
