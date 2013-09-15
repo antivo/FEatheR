@@ -1,7 +1,7 @@
 FEatheR
 =======
 (2012)
-@Author: stjepan.antivo.ivica@fer.hr
+@Author: stjepan.antivo.ivica@gmail.com
 
 Mobile App that provides information of courses at Faculty of Electronics and Computing, Croatia.
 
